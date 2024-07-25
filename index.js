@@ -18,33 +18,23 @@ const prices = {
 };
 
 function calculatePrice(orders, memberCard) {
-    let total = 0;
+    // let total = 0;
     const discounts = { "Orange set": 0.05, "Pink set": 0.05, "Green set": 0.05, };
     const discountBlack = {"Black set": 0.2};
-    for (const item in orders) {
+    let total = Object.keys(orders).reduce((total_price, item) => {
         const quantity = orders[item];
-        if (discounts[item] || discountBlack[item]) {
-            if(discounts[item]){
-                const bundles = Math.floor(quantity / 2);
-                const nonBundleQuantity = quantity % 2;
-                total += (bundles * 2 * prices[item] * (1 - discounts[item])) + (nonBundleQuantity * prices[item]);
-            }
-            else if(discountBlack[item]){
+        if (discounts[item]) {
+            const bundles = Math.floor(quantity / 2);
+            const nonBundleQuantity = quantity % 2;
+            return total_price + (bundles * 2 * prices[item] * (1 - discounts[item])) + (nonBundleQuantity * prices[item]);
+        } else if (discountBlack[item]) {
             const bundlesblack = Math.floor(quantity / 3);
             const nonBundleQuantityblack = quantity % 3;
-            total += (bundlesblack * 3 * prices[item] * (1 - discountBlack[item])) + (nonBundleQuantityblack * prices[item]);
-            // total += (bundles * 2 * prices[item] * (1 - discounts[item])) + (nonBundleQuantity * prices[item]);
-            }
+            return total_price + (bundlesblack * 3 * prices[item] * (1 - discountBlack[item])) + (nonBundleQuantityblack * prices[item]);
+        } else {
+            return total_price + quantity * prices[item];
         }
-        // else if(discountBlack[item]){
-                // const bundles = Math.floor(quantity / 3);
-                // const nonBundleQuantity = quantity % 3;
-                // total += (bundles * 3 * prices[item] * (1 - discountBlack[item])) + (nonBundleQuantity * prices[item]);
-        //     }
-        else {
-            total += quantity * prices[item];
-        }
-    }
+    }, 0);
 
     if (memberCard) {
         total *= 0.9;
